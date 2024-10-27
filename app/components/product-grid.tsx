@@ -1,137 +1,44 @@
+'use client';
+
 import Image from 'next/image';
+import { useState, useEffect } from 'react';
 
 export default function ProductGrid() {
-  var products = [
-    {
-       "id":2,
-       "name":"T-shirt",
-       "description":"Comfortable cotton T-shirt",
-       "price":19.99,
-       "stock":100,
-       "categoryId":2,
-       "images":[
-          "tshirt1.png",
-          "tshirt2.jpg"
-       ],
-       "createdAt":"2024-10-19T16:23:36.889Z",
-       "updatedAt":"2024-10-19T16:23:36.889Z",
-       "category":{
-          "id":2,
-          "name":"Clothing",
-          "description":"Apparel and accessories"
-       }
-    },
-    {
-       "id":3,
-       "name":"test",
-       "description":null,
-       "price":50,
-       "stock":200,
-       "categoryId":1,
-       "images":[
-          
-       ],
-       "createdAt":"2024-10-19T16:46:12.886Z",
-       "updatedAt":"2024-10-19T16:46:12.886Z",
-       "category":{
-          "id":1,
-          "name":"Electronics",
-          "description":"Devices and gadgets"
-       }
-    },
-    {
-       "id":4,
-       "name":"test",
-       "description":null,
-       "price":50,
-       "stock":200,
-       "categoryId":1,
-       "images":[
-          
-       ],
-       "createdAt":"2024-10-19T16:48:18.549Z",
-       "updatedAt":"2024-10-19T16:48:18.549Z",
-       "category":{
-          "id":1,
-          "name":"Electronics",
-          "description":"Devices and gadgets"
-       }
-    },
-    {
-       "id":5,
-       "name":"test",
-       "description":null,
-       "price":50,
-       "stock":200,
-       "categoryId":1,
-       "images":[
-          
-       ],
-       "createdAt":"2024-10-19T16:49:52.180Z",
-       "updatedAt":"2024-10-19T16:49:52.180Z",
-       "category":{
-          "id":1,
-          "name":"Electronics",
-          "description":"Devices and gadgets"
-       }
-    },
-    {
-       "id":6,
-       "name":"test",
-       "description":null,
-       "price":50,
-       "stock":200,
-       "categoryId":1,
-       "images":[
-          
-       ],
-       "createdAt":"2024-10-19T16:50:49.700Z",
-       "updatedAt":"2024-10-19T16:50:49.700Z",
-       "category":{
-          "id":1,
-          "name":"Electronics",
-          "description":"Devices and gadgets"
-       }
-    },
-    {
-       "id":7,
-       "name":"test",
-       "description":null,
-       "price":50,
-       "stock":200,
-       "categoryId":1,
-       "images":[
-          
-       ],
-       "createdAt":"2024-10-19T16:50:51.168Z",
-       "updatedAt":"2024-10-19T16:50:51.168Z",
-       "category":{
-          "id":1,
-          "name":"Electronics",
-          "description":"Devices and gadgets"
-       }
-    },
-    {
-       "id":8,
-       "name":"test",
-       "description":null,
-       "price":50,
-       "stock":200,
-       "categoryId":1,
-       "images":[
-          
-       ],
-       "createdAt":"2024-10-19T16:50:51.716Z",
-       "updatedAt":"2024-10-19T16:50:51.716Z",
-       "category":{
-          "id":1,
-          "name":"Electronics",
-          "description":"Devices and gadgets"
-       }
-    }
-  ];
+  type Product = {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    stock: number;
+    images: string[];
+  };
 
-  //products = [...products, ...products, ...products, ...products];
+  // Get products from API
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('http://localhost:3001/products')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data.entries)) {
+          setProducts(data.entries);
+        } else {
+          throw new Error('Response is not an array');
+        }
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-10">
