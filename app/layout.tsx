@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CartProvider } from "./context/cart-context";
 import Navbar from "./components/navbar";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -26,11 +27,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[url(/images/background.jpg)] bg-cover bg-center bg-fixed`}
-      >
-        <Navbar />
-        {children}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[url(/images/background.jpg)] bg-cover bg-center bg-fixed`}>
+        <CartProvider>
+          <Navbar />
+          {children}
+        </CartProvider>
       </body>
     </html>
   );

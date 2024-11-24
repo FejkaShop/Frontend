@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import { useCart } from '../context/cart-context';
 
 export default function ProductGrid() {
   type Product = {
@@ -13,6 +14,7 @@ export default function ProductGrid() {
     images: string[];
   };
 
+  const { addToCart } = useCart();
   // Get products from API
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,7 +48,7 @@ export default function ProductGrid() {
         {products.map((product) => (
           <div key={product.id} className="bg-white shadow-2xl rounded-lg overflow-hidden transition transform hover:scale-105 hover:shadow-xl">
             <Image
-              src={product.images[0] ? `/images/${product.images[0]}` : '/images/placeholder.png'}
+              src={product.images[0] ? `${product.images[0]}` : '/images/placeholder.png'}
               alt={product.name}
               width={300}
               height={300}
@@ -58,11 +60,22 @@ export default function ProductGrid() {
               <p className="text-gray-800 mt-2">${product.price}</p>
               <p className="text-gray-500">Stock: {product.stock}</p>
 
-              <button className="mt-4 bg-teal-700 hover:bg-teal-500 text-white font-semibold py-2 px-4 rounded">
+              <button
+                className="mt-4 bg-teal-700 hover:bg-teal-500 text-white font-semibold py-2 px-4 rounded"
+                onClick={() => 
+                  addToCart({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: 1,
+                    image: product.images[0] || '/images/placeholder.png'
+                  })
+                }
+              >
                 Add to Cart
               </button>
 
-              <button className="mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded">
+              <button className="mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded" onClick={() => window.location.href = `/${product.id}`}>
                 View Details
               </button>
             </div>
