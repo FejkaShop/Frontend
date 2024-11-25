@@ -50,13 +50,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   // Function to add item to cart
   const addToCart = (item: CartItem) => {
-    console.log('Adding to cart:', item); // This should log once per click
     setCart((prevCart) => {
-      console.log('Previous cart:', prevCart); // Log to verify
       const updatedCart = [...prevCart];
       const existingItemIndex = prevCart.findIndex((i) => i.id === item.id);
       if (existingItemIndex >= 0) {
-        console.log(item.id, item.quantity); // Check here
         updatedCart[existingItemIndex].quantity += 1;
       } else {
         updatedCart.push({ ...item, quantity: 1 });
@@ -73,7 +70,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   // Function to update item quantity in cart
   const updateQuantity = (id: number, quantity: number) => {
-    console.log(id, quantity);
     setCart((prevCart) => {
       return prevCart.map((item) =>
         item.id === id ? { ...item, quantity } : item
