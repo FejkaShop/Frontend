@@ -24,6 +24,27 @@ export default function CheckoutPage() {
       return;
     }
 
+    fetch('http://localhost:3000/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: 1,
+        orderItems: cart.map((item) => ({
+          productId: item.id,
+          quantity: item.quantity,
+        })),
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Order placed successfully:', data);
+      })
+      .catch((error) => {
+        console.error('Error placing order:', error);
+      });
+
     clearCart();
     window.location.href = '/';
   };
