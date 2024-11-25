@@ -92,7 +92,7 @@ export default function CartPage() {
           Total: ${calculateTotal().toFixed(2)}
         </div>
         <button
-          onClick={() => alert('Proceeding to checkout...')}
+          onClick={() => window.location.href = '/checkout'}
           className="bg-teal-700 text-white px-6 py-3 rounded-lg hover:bg-teal-500"
         >
           Checkout
