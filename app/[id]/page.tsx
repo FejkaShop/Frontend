@@ -28,7 +28,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   useEffect(() => {
     const productId = params.id;
 
-    fetch(`http://localhost:3001/products/${productId}`)
+    fetch(`http://localhost:3000/products/${productId}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch product details');
@@ -63,7 +63,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
         {product.images.length > 0 && (
           <div className="relative w-full md:w-1/2">
             <Image
-              src={`http://localhost:3001/images/${product.images[currentImageIndex]}`}
+              src={`http://localhost:3000/images/${product.images[currentImageIndex]}`}
               alt={product.name}
               width={600}
               height={400}

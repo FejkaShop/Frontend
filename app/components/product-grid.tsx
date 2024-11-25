@@ -21,7 +21,7 @@ export default function ProductGrid() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('http://localhost:3001/products')
+    fetch('http://localhost:3000/products')
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch products');
