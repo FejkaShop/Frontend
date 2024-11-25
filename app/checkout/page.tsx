@@ -24,7 +24,6 @@ export default function CheckoutPage() {
       return;
     }
 
-    alert(`Thank you for your order, ${form.name}!`);
     clearCart();
     window.location.href = '/';
   };
