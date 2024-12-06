@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useCart } from '../context/cart-context';
+import { toast } from 'react-toastify';
 
 export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
@@ -9,7 +10,7 @@ export default function CheckoutPage() {
     name: '',
     email: '',
     address: '',
-    paymentMethod: 'credit-card',
+    paymentMethod: 'CREDIT_CARD',
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -17,37 +18,62 @@ export default function CheckoutPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCheckout = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (cart.length === 0) {
-      alert('Your cart is empty. Add items before checking out.');
-      return;
-    }
+  const [orderPlaced, setOrderPlaced] = useState(false);
 
-    fetch('http://localhost:3000/orders', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userId: 1,
-        orderItems: cart.map((item) => ({
-          productId: item.id,
-          quantity: item.quantity,
-        })),
-      }),
+const handleCheckout = (e: React.FormEvent) => {
+  e.preventDefault();
+  if (cart.length === 0) {
+    alert('Your cart is empty. Add items before checking out.');
+    return;
+  }
+
+  const user = localStorage.getItem('user');
+  if (!user) {
+    toast.error('Please login before placing an order.');
+    return;
+  }
+
+  fetch('http://localhost:3000/orders', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      userId: JSON.parse(user).id,
+      orderItems: cart.map((item) => ({
+        productId: item.id,
+        quantity: item.quantity,
+      })),
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Order placed successfully:', data);
+      setOrderPlaced(true);
     })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('Order placed successfully:', data);
-      })
-      .catch((error) => {
-        console.error('Error placing order:', error);
-      });
+    .catch((error) => {
+      console.error('Error placing order:', error);
+    });
 
-    clearCart();
-    window.location.href = '/';
-  };
+  clearCart();
+};
+
+if (orderPlaced) {
+  return (
+    <div className="flex justify-center items-center min-h-screen text-center">
+      <div className="p-8 bg-white rounded-lg shadow-lg">
+        <h2 className="text-3xl font-semibold text-gray-700">Thank You!</h2>
+        <p className="text-lg text-gray-500 mt-4">Your order has been placed successfully.</p>
+        <button
+          onClick={() => window.location.href = '/'}
+          className="mt-4 inline-block bg-teal-700 text-white py-2 px-4 rounded hover:bg-teal-500"
+        >
+          Go to Home
+        </button>
+      </div>
+    </div>
+  );
+}
 
   if (cart.length === 0) {
     return (
@@ -124,9 +150,9 @@ export default function CheckoutPage() {
               onChange={handleInputChange}
               className="w-full px-4 py-2 border rounded-lg"
             >
-              <option value="credit-card">Credit Card</option>
-              <option value="paypal">PayPal</option>
-              <option value="cash-on-delivery">Cash on Delivery</option>
+              <option value="CREDIT_CARD">Credit Card</option>
+              <option value="PAYPAL">PayPal</option>
+              <option value="BANK_TRANSFER">Bank Transfer</option>
             </select>
           </div>
           <button

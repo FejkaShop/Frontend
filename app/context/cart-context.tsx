@@ -1,6 +1,8 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Type definition for a CartItem
 export type CartItem = {
@@ -60,6 +62,18 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       }
       return updatedCart;
     });
+
+    // Show a notification when an item is added to the cart
+    toast.success(`${item.name} added to cart!`, {
+      position: "top-right",
+      autoClose: 750,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
   };
   
 
@@ -84,6 +98,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   return (
     <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart }}>
+      <ToastContainer />
       {children}
     </CartContext.Provider>
   );

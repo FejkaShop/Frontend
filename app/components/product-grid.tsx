@@ -9,6 +9,11 @@ export default function ProductGrid() {
     id: number;
     name: string;
     description: string;
+    category: {
+      id: number;
+      name: string;
+      description: string;
+    }
     price: number;
     stock: number;
     images: string[];
@@ -39,13 +44,40 @@ export default function ProductGrid() {
       .finally(() => setLoading(false));
   }, []);
 
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const handleCategoryChange = (category: string | null) => {
+    setSelectedCategory(category);
+  };
+  
+  const filteredProducts = selectedCategory
+    ? products.filter((product) => product.category.name === selectedCategory)
+    : products;
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
-
+  
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-10">
+    <div className="flex flex-col items-center justify-start min-h-screen py-10">
+      <div className="mb-6">
+        <button
+          className={`mr-4 ${selectedCategory === null ? 'bg-teal-700 text-white' : 'bg-gray-200 text-gray-800'} font-semibold py-2 px-4 rounded`}
+          onClick={() => handleCategoryChange(null)}
+        >
+          All
+        </button>
+        {Array.from(new Set(products.map((product) => product.category.name))).map((category) => (
+          <button
+            key={category}
+            className={`mr-4 ${selectedCategory === category ? 'bg-teal-700 text-white' : 'bg-gray-200 text-gray-800'} font-semibold py-2 px-4 rounded`}
+            onClick={() => handleCategoryChange(category)}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl px-4">
-        {products.map((product) => (
+        {filteredProducts.map((product) => (
           <div key={product.id} className="bg-white shadow-2xl rounded-lg overflow-hidden transition transform hover:scale-105 hover:shadow-xl">
             <Image
               src={product.images[0] ? `${product.images[0]}` : '/images/placeholder.png'}
@@ -59,7 +91,7 @@ export default function ProductGrid() {
               <p className="text-gray-500">{product.description}</p>
               <p className="text-gray-800 mt-2">${product.price}</p>
               <p className="text-gray-500">Stock: {product.stock}</p>
-
+  
               <button
                 className="mt-4 bg-teal-700 hover:bg-teal-500 text-white font-semibold py-2 px-4 rounded"
                 onClick={() => 
@@ -74,7 +106,7 @@ export default function ProductGrid() {
               >
                 Add to Cart
               </button>
-
+  
               <button className="mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded" onClick={() => window.location.href = `/${product.id}`}>
                 View Details
               </button>

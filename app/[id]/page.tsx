@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useCart } from '../context/cart-context';
 import Image from 'next/image';
 
 type Product = {
@@ -24,6 +25,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   const [error, setError] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0); // Image cycling index
   const router = useRouter();
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const productId = params.id;
@@ -118,7 +120,17 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
           <p className="text-gray-500">{product.category.description}</p>
 
           <div className="flex flex-wrap gap-2 mt-auto">
-            <button className="bg-teal-700 hover:bg-teal-500 text-white font-semibold py-2 px-4 rounded">
+            <button className="bg-teal-700 hover:bg-teal-500 text-white font-semibold py-2 px-4 rounded"
+              onClick={() => 
+                addToCart({
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  quantity: 1,
+                  image: product.images[0] || '/images/placeholder.png'
+                })
+              }
+            >
               Add to Cart
             </button>
 
