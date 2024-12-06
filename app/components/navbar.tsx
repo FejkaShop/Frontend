@@ -7,7 +7,7 @@ export default function Navbar() {
 
   return (
     <div className="flex justify-between items-center p-3 bg-gradient-to-l from-[#6c9695]">
-      <div>
+      <div onClick={() => {window.location.href = '/'}} className="cursor-pointer">
         <img src="/images/logo_cropped.png" alt="logo" className="h-12" />
       </div>
       <h1 className="text-4xl font-bold text-white">FEJKA SHOP</h1>
