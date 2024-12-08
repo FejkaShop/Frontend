@@ -55,7 +55,7 @@ type NewReview = {
 export default function ProductDetail({ params }: { params: { id: string } }) {
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [newReview, setNewReview] = useState<NewReview>({ userId: 0, rating: 0, comment: '', productId: parseInt(params.id) });
+  const [newReview, setNewReview] = useState<NewReview>({ userId: 0, rating: 3, comment: '', productId: parseInt(params.id) });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0); // Image cycling index
@@ -240,7 +240,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
               <div key={review.id} className="mb-4">
                 <h3 className="text-lg font-semibold">{review.user.name}</h3>
                 <p className="text-gray-600">{review.comment}</p>
-                <p className="text-yellow-500">Rating: {review.rating}/5</p>
+                <p className="text-teal-700">Rating: {review.rating}/5</p>
               </div>
             ))
           ) : (
@@ -249,21 +249,25 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
         </div>
         {user && (
           <div className="p-4 border-t">
-            <h3 className="text-xl font-semibold mb-4">Add a Review</h3>
+            <div className="flex flex-row items-center">
+              <h3 className="text-xl font-semibold mb-4">Add a Review</h3>
+              <input
+                type="number"
+                value={newReview.rating}
+                onChange={(e) => {
+                const rating = Math.max(1, Math.min(parseInt(e.target.value), 5));
+                setNewReview({ ...newReview, rating });
+                }}
+                className="mb-2 p-2 border rounded w-16 ml-10 text-teal-700"
+                min="1"
+                max="5"
+              />
+            </div>
             <textarea
               placeholder="Your Review"
               value={newReview.comment}
               onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
               className="mb-2 p-2 border rounded w-full"
-            />
-            <input
-              type="number"
-              placeholder="Rating (0-5)"
-              value={newReview.rating}
-              onChange={(e) => setNewReview({ ...newReview, rating: parseInt(e.target.value) })}
-              className="mb-2 p-2 border rounded w-full"
-              min="0"
-              max="5"
             />
             <button
               className="bg-teal-700 hover:bg-teal-500 text-white font-semibold py-2 px-4 rounded"
