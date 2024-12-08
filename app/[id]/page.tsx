@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../context/cart-context';
+import { useAuth } from '../context/auth-context';
 import Image from 'next/image';
 
 type Product = {
@@ -19,13 +20,47 @@ type Product = {
   };
 };
 
+type Review = {
+  id: number;
+  productId: number;
+  userId: number;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: number;
+    email: string;
+    name: string;
+    role: string;
+  };
+};
+
+type ReviewResponse = {
+  limit: number;
+  offset: number;
+  totalEntries: number;
+  hasMoreEntries: boolean;
+  entries: Review[];
+};
+
+type NewReview = {
+  userId: number;
+  productId: number;
+  rating: number;
+  comment: string;
+};
+
 export default function ProductDetail({ params }: { params: { id: string } }) {
   const [product, setProduct] = useState<Product | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [newReview, setNewReview] = useState<NewReview>({ userId: 0, rating: 0, comment: '', productId: parseInt(params.id) });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0); // Image cycling index
   const router = useRouter();
   const { addToCart } = useCart();
+  const { user } = useAuth();
 
   useEffect(() => {
     const productId = params.id;
@@ -40,7 +75,60 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
       .then((data) => setProduct(data))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
+
+    fetch(`http://localhost:3000/reviews/product/${productId}?limit=10000`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch reviews');
+        }
+        return response.json();
+      })
+      .then((data: ReviewResponse) => {
+        setReviews(data.entries)
+      })
+      .catch((err) => setError(err.message));
   }, [params.id]);
+
+  const handleAddReview = () => {
+    if (!user) {
+      setError('You must be logged in to add a review');
+      return;
+    }
+
+    const productId = parseInt(params.id);
+
+    fetch(`http://localhost:3000/reviews`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ...newReview, userId: user.id, productId }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to add review');
+        }
+        return response.json();
+      })
+      .then((data: Review) => {
+        
+        fetch(`http://localhost:3000/reviews/product/${productId}?limit=10000`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch reviews');
+          }
+          return response.json();
+        })
+        .then((data: ReviewResponse) => {
+          setReviews(data.entries)
+        })
+        .catch((err) => setError(err.message));
+
+
+        setNewReview({ userId: user.id, rating: 0, comment: '', productId });
+      })
+      .catch((err) => setError(err.message));
+  };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -139,6 +227,48 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
               Back to Products
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="w-full max-w-6xl mt-8 bg-white shadow-lg rounded-lg overflow-hidden">
+        <h2 className="text-2xl font-semibold text-gray-800 p-4 border-b">Reviews</h2>
+        <div className="p-4">
+          {reviews.length > 0 ? (
+            reviews.map((review) => (
+              <div key={review.id} className="mb-4">
+                <h3 className="text-lg font-semibold">{review.user.name}</h3>
+                <p className="text-gray-600">{review.comment}</p>
+                <p className="text-yellow-500">Rating: {review.rating}/5</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500">No reviews yet.</p>
+          )}
+        </div>
+        <div className="p-4 border-t">
+          <h3 className="text-xl font-semibold mb-4">Add a Review</h3>
+          <textarea
+            placeholder="Your Review"
+            value={newReview.comment}
+            onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+            className="mb-2 p-2 border rounded w-full"
+          />
+          <input
+            type="number"
+            placeholder="Rating (0-5)"
+            value={newReview.rating}
+            onChange={(e) => setNewReview({ ...newReview, rating: parseInt(e.target.value) })}
+            className="mb-2 p-2 border rounded w-full"
+            min="0"
+            max="5"
+          />
+          <button
+            className="bg-teal-700 hover:bg-teal-500 text-white font-semibold py-2 px-4 rounded"
+            onClick={handleAddReview}
+          >
+            Submit Review
+          </button>
         </div>
       </div>
     </div>
