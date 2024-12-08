@@ -247,30 +247,37 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
             <p className="text-gray-500">No reviews yet.</p>
           )}
         </div>
-        <div className="p-4 border-t">
-          <h3 className="text-xl font-semibold mb-4">Add a Review</h3>
-          <textarea
-            placeholder="Your Review"
-            value={newReview.comment}
-            onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
-            className="mb-2 p-2 border rounded w-full"
-          />
-          <input
-            type="number"
-            placeholder="Rating (0-5)"
-            value={newReview.rating}
-            onChange={(e) => setNewReview({ ...newReview, rating: parseInt(e.target.value) })}
-            className="mb-2 p-2 border rounded w-full"
-            min="0"
-            max="5"
-          />
-          <button
-            className="bg-teal-700 hover:bg-teal-500 text-white font-semibold py-2 px-4 rounded"
-            onClick={handleAddReview}
-          >
-            Submit Review
-          </button>
-        </div>
+        {user && (
+          <div className="p-4 border-t">
+            <h3 className="text-xl font-semibold mb-4">Add a Review</h3>
+            <textarea
+              placeholder="Your Review"
+              value={newReview.comment}
+              onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+              className="mb-2 p-2 border rounded w-full"
+            />
+            <input
+              type="number"
+              placeholder="Rating (0-5)"
+              value={newReview.rating}
+              onChange={(e) => setNewReview({ ...newReview, rating: parseInt(e.target.value) })}
+              className="mb-2 p-2 border rounded w-full"
+              min="0"
+              max="5"
+            />
+            <button
+              className="bg-teal-700 hover:bg-teal-500 text-white font-semibold py-2 px-4 rounded"
+              onClick={handleAddReview}
+            >
+              Submit Review
+            </button>
+          </div>
+        )}
+        {!user && (
+          <div className="p-4 border-t">
+            <h3 className="text-xl font-semibold mb-4">Login to add your review</h3>
+          </div>
+        )}
       </div>
     </div>
   );
