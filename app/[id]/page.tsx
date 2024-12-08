@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '../context/cart-context';
 import { useAuth } from '../context/auth-context';
 import Image from 'next/image';
+import { toast } from 'react-toastify';
 
 type Product = {
   id: number;
@@ -91,7 +92,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
 
   const handleAddReview = () => {
     if (!user) {
-      setError('You must be logged in to add a review');
+      toast.error('You must be logged in to add a review');
       return;
     }
 
@@ -104,9 +105,9 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
       },
       body: JSON.stringify({ ...newReview, userId: user.id, productId }),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) {
-          throw new Error('Failed to add review');
+          throw new Error((await response.json()).error);
         }
         return response.json();
       })
@@ -127,7 +128,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
 
         setNewReview({ userId: user.id, rating: 0, comment: '', productId });
       })
-      .catch((err) => setError(err.message));
+      .catch((err) => toast.error(err.message));
   };
 
   if (loading) return <p>Loading...</p>;
